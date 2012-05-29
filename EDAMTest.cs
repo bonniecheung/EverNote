@@ -26,15 +26,11 @@ using SampleApp;
 public class EDAMTest {
     public static void Main(string[] args) {
 
+        // Data source name string
         String connectionString = "DSN=EverNoteDB;Uid=postgres;Pwd=tindrbonnie;";
 
+        // Developer token for Evernote API
         String authToken = "S=s1:U=2261f:E=13eccfa5d71:C=13775493171:P=1cd:A=en-devtoken:H=fe7ee8dac619c7d380a0f9f3731a8698";
-
-        if (authToken == "your developer token") {
-          Console.WriteLine("Please fill in your developer token");
-          Console.WriteLine("To get a developer token, visit https://sandbox.evernote.com/api/DeveloperToken.action");
-          return;
-        }
 
         String evernoteHost = "sandbox.evernote.com";
                 
@@ -62,7 +58,7 @@ public class EDAMTest {
         TProtocol noteStoreProtocol = new TBinaryProtocol(noteStoreTransport);
         NoteStore.Client noteStore = new NoteStore.Client(noteStoreProtocol);
 
-        // List all of the notebooks in the user's account        
+        // Lists all of the notebooks in the user's account with a notebook count       
         List<Notebook> notebooks = noteStore.listNotebooks(authToken);
         Console.WriteLine("Found " + notebooks.Count + " notebooks:");
         foreach (Notebook notebook in notebooks) {
@@ -72,29 +68,25 @@ public class EDAMTest {
         int offset = 0;
         int maxNotes = 15;
         NoteFilter filter = new NoteFilter();
-        filter.Words = "business";
+
+        Console.WriteLine();
+        Console.WriteLine("What word do you want to search through the notes for?");
+        Console.WriteLine("Enter word: ");
+        filter.Words = Console.ReadLine();
+        //filter.Words = "business";
+        
         NoteList noteList = new NoteList();
 
-        //This finds all notes containing the word "business"
+        //This finds all notes containing the word that was given by the user
         noteList = noteStore.findNotes(authToken, filter, offset, maxNotes);
 
-        Console.WriteLine();
-        Console.WriteLine("The results of the query..." + noteList);
-        Console.WriteLine();
-
-        //This stores the Guids of the notes containing the word "business"
+        //This stores the Guids of the notes containing the word
         ArrayList guidList = new ArrayList();
-
-        //This stores the entire note contents of all notes containing the word "business"
-        ArrayList contentsList = new ArrayList();
-
-        //This stores all lines surrounding the line containing the word "business"
-        ArrayList linesContaining = new ArrayList();
 
         // For each note in the list of notes...
         foreach (Note fetchedNote in noteList.Notes)
         {
-            Console.WriteLine("  * " + fetchedNote.Guid);
+            //Console.WriteLine("  * " + fetchedNote.Guid);
 
             // Add guid to list
             guidList.Add(fetchedNote.Guid);
@@ -105,7 +97,7 @@ public class EDAMTest {
         {
             // Add block of plain text of the note to a list
             String text = noteStore.getNoteContent(authToken, Guid);
-            contentsList.Add(text);
+            //contentsList.Add(text);
 
             string[] split = Regex.Split(text, "\\n");
             
@@ -130,29 +122,22 @@ public class EDAMTest {
                     line1 = split[n - 1];
                     line3 = split[n + 1];
 
-                    linesContaining.Add(line1);
-                    linesContaining.Add(line2);
-                    linesContaining.Add(line3);
-
                     Entry entry = new Entry();
                     entry.setGuid(Guid);
                     entry.setLine1(line1);
                     entry.setLine2(line2);
                     entry.setLine3(line3);
 
-                    Console.WriteLine("This is the contents of the Entry object...");
-                    entry.displayGuid();
+                    Console.WriteLine("Note GUID: " + entry.getGuid());
+                    Console.WriteLine();
                     entry.displayLines();
-                    
-                    String insertEntry = "INSERT INTO notes (guid, line1, line2, line3) " +
-         "VALUES ('" + entry.getGuid() + "','" + entry.getLine1() + "','" + entry.getLine2() + "', '" + entry.getLine3() + "')";
-                     
-                    Console.WriteLine(insertEntry);
-                    entry.InsertRow(connectionString, insertEntry);
+                    entry.InsertRow(connectionString);
                 }
             }
         }
 
+        Console.WriteLine();
+        Console.WriteLine("These lines have been saved to a Postgresql database under the table Notes.");
         Console.WriteLine();
 
         Console.WriteLine("Click ENTER to continue...");

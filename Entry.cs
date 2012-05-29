@@ -2,6 +2,7 @@
 using Oracle.DataAccess.Client;
 using System.Data;
 using System.Data.Odbc;
+using System.Configuration;
 
 
 public class Entry
@@ -38,9 +39,10 @@ public class Entry
 
     public void displayLines()
     {
-        Console.WriteLine(line1);
-        Console.WriteLine(line2);
-        Console.WriteLine(line3);
+        //ConfigurationSettings.AppSettings["<keyName>"];
+        Console.WriteLine("Line 1: " + line1);
+        Console.WriteLine("Line 2: " + line2);
+        Console.WriteLine("Line 3: " + line3);
     }
 
     public String getGuid()
@@ -63,8 +65,10 @@ public class Entry
         return line3;
     }
 
-    public void InsertRow(string connectionString, string insertSQL)
+    public void InsertRow(string connectionString)
     {
+        String insertSQL = "INSERT INTO notes (guid, line1, line2, line3) " +
+         "VALUES ('" + this.getGuid() + "','" + this.getLine1() + "','" + this.getLine2() + "', '" + this.getLine3() + "')";
 
         using (OdbcConnection connection =
                    new OdbcConnection(connectionString))
