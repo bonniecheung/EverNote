@@ -7,10 +7,10 @@ using System.Configuration;
 
 public class Entry
 {
-    String Guid;
-    String line1;
-    String line2;
-    String line3;
+    public String Guid;
+    public String line1;
+    public String line2;
+    public String line3;
 
     public void setGuid(String Guid)
     {
@@ -65,7 +65,7 @@ public class Entry
         return line3;
     }
 
-    public void InsertRow(string connectionString)
+    public Boolean InsertRow(string connectionString)
     {
         String insertSQL = "INSERT INTO notes (guid, line1, line2, line3) " +
          "VALUES ('" + this.getGuid() + "','" + this.getLine1() + "','" + this.getLine2() + "', '" + this.getLine3() + "')";
@@ -86,12 +86,15 @@ public class Entry
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                return false;
             }
             // The connection is automatically closed when the
             // code exits the using block.
+            return true;
         }
 
 
     }
+
 
 }

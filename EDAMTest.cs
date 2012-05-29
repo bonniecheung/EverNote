@@ -65,8 +65,14 @@ public class EDAMTest {
             Console.WriteLine("  * " + notebook.Name);
         }
 
+        //The offset represents the index of the first note that is to be returned
         int offset = 0;
+
+        //maxNotes represents the number of note that is to be returned
         int maxNotes = 15;
+        
+        //NoteFilter is a struct that contains a list of criteria you can search notes for.
+        //In this app, NoteFilter.Words will be used to return notes containing a certain string.
         NoteFilter filter = new NoteFilter();
 
         Console.WriteLine();
@@ -75,6 +81,7 @@ public class EDAMTest {
         filter.Words = Console.ReadLine();
         //filter.Words = "business";
         
+        //Creates a new NoteList struct, which returns a list of individual notes out of a larger set of them
         NoteList noteList = new NoteList();
 
         //This finds all notes containing the word that was given by the user
@@ -103,16 +110,16 @@ public class EDAMTest {
             
             Console.WriteLine();
 
-            int max = split.Length;
+            int MAX = split.Length;
 
             String line1;
             String line2;
             String line3;
 
-            // This for-loop cycles through each line in the array of lines and tests if the line contains the word "business".
-            // If so, it adds the surrounding lines to the linesContaining arrayList.
+            // This for-loop cycles through each line in the array of lines and tests if the line contains the word.
+            // If so, it sets the note Guid as well as the surrounding lines as properties to a new Entry object.
 
-            for (int n = 0; n < max; n++)
+            for (int n = 0; n < MAX; n++)
             {
                 Boolean b = split[n].Contains(filter.Words);
 
