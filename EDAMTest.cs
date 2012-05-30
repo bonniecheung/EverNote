@@ -22,6 +22,8 @@ using Evernote.EDAM.NoteStore;
 using Evernote.EDAM.Error;
 using SampleApp.Properties;
 using SampleApp;
+using SampleApp.Database.DataManager;
+using SampleApp.Domain.Objects;
 
 public class EDAMTest {
     public static void Main(string[] args) {
@@ -146,6 +148,17 @@ public class EDAMTest {
         Console.WriteLine();
         Console.WriteLine("These lines have been saved to a Postgresql database under the table Notes.");
         Console.WriteLine();
+
+        FNHSessionManager<NoteEntry> sessionManager = new FNHSessionManager<NoteEntry>(connectionString, FNHSessionManager<NoteEntry>.DatabaseType.Postgres);
+        FNHRepository<NoteEntry> repository = new FNHRepository<NoteEntry>(sessionManager);
+
+        NoteEntry noteEntry = repository.RetrieveById(1);
+
+        Console.WriteLine("This is entry 1 retrieved from the database...");
+        Console.WriteLine("GUID: " + noteEntry.Guid);
+        Console.WriteLine("Line 1: " + noteEntry.Line1);
+        Console.WriteLine("Line 2: " + noteEntry.Line2);
+        Console.WriteLine("Line 3: " + noteEntry.Line3);
 
         Console.WriteLine("Click ENTER to continue...");
         Console.ReadLine();
