@@ -8,6 +8,7 @@ using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Context;
+using System.Configuration;
 
 namespace SampleApp.Database.DataManager
 {
@@ -21,7 +22,8 @@ namespace SampleApp.Database.DataManager
         /// </summary>
         public enum DatabaseType
         {
-            Postgres = 0,
+            MySQL = 0,
+            //Postgres,
             //MsSql = 0,
             MsSqlCe
         }
@@ -62,19 +64,38 @@ namespace SampleApp.Database.DataManager
         /// <param name="dbType">The database type to create a connection. </param>
         public FNHSessionManager(string dbConfigKey, DatabaseType dbType)
         {
+            string connectionString = ConfigurationManager.ConnectionStrings["mySqlConnectionString"].ConnectionString;
+            
             switch (dbType)
             {
-                case DatabaseType.Postgres:
+                case DatabaseType.MySQL:
                     _sessionFactory = Fluently.Configure()
                         .Database(
-                            PostgreSQLConfiguration.PostgreSQL82.ConnectionString(dbConfigKey)
-                            //MsSqlConfiguration.MsSql2008
-                                //.ConnectionString(dbConfigKey)
+                            MySQLConfiguration.Standard
+                                .ConnectionString(c => c.FromConnectionStringWithKey(connectionString))
                         )
                         .Mappings(m => m.FluentMappings.AddFromAssemblyOf<T>())
                         .CurrentSessionContext(typeof(ManagedWebSessionContext).FullName)
                         .BuildSessionFactory();
                     break;
+                //case DatabaseType.MySQL:
+                //    FluentConfiguration config = Fluently.Configure();
+                //    config.Database(MySQLConfiguration.Standard.ConnectionString(connectionString));
+                //    //MsSqlConfiguration.MsSql2008
+                //    //.ConnectionString(dbConfigKey)
+                //    config.Mappings(m => m.FluentMappings.AddFromAssemblyOf<T>());
+                //    config.CurrentSessionContext(typeof(ManagedWebSessionContext).FullName);
+                //    _sessionFactory = config.BuildSessionFactory();
+                //    break;
+                //case DatabaseType.Postgres:
+                //    FluentConfiguration config = Fluently.Configure();
+                //    config.Database(PostgreSQLConfiguration.Standard.ConnectionString(connectionString));
+                //            //MsSqlConfiguration.MsSql2008
+                //                //.ConnectionString(dbConfigKey)
+                //    config.Mappings(m => m.FluentMappings.AddFromAssemblyOf<T>());
+                //    config.CurrentSessionContext(typeof(ManagedWebSessionContext).FullName);
+                //   _sessionFactory = config.BuildSessionFactory();
+                //    break;
                 case DatabaseType.MsSqlCe:
                     _sessionFactory = Fluently.Configure()
                         .Database(

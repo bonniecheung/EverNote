@@ -25,7 +25,7 @@ using SampleApp;
 using SampleApp.Database.DataManager;
 using SampleApp.Domain.Objects;
 
-public class EDAMTest {
+public class NoteFetcher {
     public static void Main(string[] args) {
 
         // Data source name string
@@ -104,10 +104,10 @@ public class EDAMTest {
         // For each guid in the list...
         foreach (String Guid in guidList)
         {
-            // Add block of plain text of the note to a list
+            // Get the contents of the matching notes
             String text = noteStore.getNoteContent(authToken, Guid);
-            //contentsList.Add(text);
 
+            // Then split the contents by line
             string[] split = Regex.Split(text, "\\n");
             
             Console.WriteLine();
@@ -141,6 +141,8 @@ public class EDAMTest {
                     Console.WriteLine();
                     entry.displayLines();
                     entry.InsertRow(connectionString);
+                    Console.WriteLine();
+                    entry.getLastInsertedRow(connectionString);
                 }
             }
         }
@@ -149,16 +151,16 @@ public class EDAMTest {
         Console.WriteLine("These lines have been saved to a Postgresql database under the table Notes.");
         Console.WriteLine();
 
-        FNHSessionManager<NoteEntry> sessionManager = new FNHSessionManager<NoteEntry>(connectionString, FNHSessionManager<NoteEntry>.DatabaseType.Postgres);
-        FNHRepository<NoteEntry> repository = new FNHRepository<NoteEntry>(sessionManager);
+        //FNHSessionManager<NoteEntry> sessionManager = new FNHSessionManager<NoteEntry>(connectionString, FNHSessionManager<NoteEntry>.DatabaseType.MySQL);
+        //FNHRepository<NoteEntry> repository = new FNHRepository<NoteEntry>(sessionManager);
 
-        NoteEntry noteEntry = repository.RetrieveById(1);
+        //NoteEntry noteEntry = repository.RetrieveById(1);
 
-        Console.WriteLine("This is entry 1 retrieved from the database...");
-        Console.WriteLine("GUID: " + noteEntry.Guid);
-        Console.WriteLine("Line 1: " + noteEntry.Line1);
-        Console.WriteLine("Line 2: " + noteEntry.Line2);
-        Console.WriteLine("Line 3: " + noteEntry.Line3);
+        //Console.WriteLine("This is entry 1 retrieved from the database...");
+        //Console.WriteLine("GUID: " + noteEntry.Guid);
+        //Console.WriteLine("Line 1: " + noteEntry.Line1);
+        //Console.WriteLine("Line 2: " + noteEntry.Line2);
+        //Console.WriteLine("Line 3: " + noteEntry.Line3);
 
         Console.WriteLine("Click ENTER to continue...");
         Console.ReadLine();

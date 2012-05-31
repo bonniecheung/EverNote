@@ -69,12 +69,43 @@ using System.Configuration;
             String insertSQL = "INSERT INTO notes (guid, line1, line2, line3) " +
              "VALUES ('" + this.getGuid() + "','" + this.getLine1() + "','" + this.getLine2() + "', '" + this.getLine3() + "')";
 
+            Boolean b = executeQuery(insertSQL, connectionString);
+
+            return b;
+        }
+
+        public void getLastInsertedRow(string myConnectionString)
+        {
+
+            String mySelectQuery = "SELECT id, guid, line1, line2, line3 FROM notes WHERE id = (SELECT MAX(id) FROM notes)";
+
+            OdbcConnection myConnection = new OdbcConnection(myConnectionString);
+            OdbcCommand myCommand = new OdbcCommand(mySelectQuery, myConnection);
+            myConnection.Open();
+            OdbcDataReader myReader = myCommand.ExecuteReader(CommandBehavior.CloseConnection);
+            while (myReader.Read())
+            {
+                Console.WriteLine("Retrieving row " + myReader.GetString(0) + " from database...");
+                Console.WriteLine("GUID: " + myReader.GetString(1));
+                this.Guid = myReader.GetString(1);
+                Console.WriteLine("Line 1: " + myReader.GetString(2));
+                this.line1 = myReader.GetString(2);
+                Console.WriteLine("Line 2: " + myReader.GetString(3));
+                this.line2 = myReader.GetString(3);
+                Console.WriteLine("Line 3: " + myReader.GetString(4));
+                this.line3 = myReader.GetString(4);
+            }
+            myReader.Close();
+        }
+
+        public Boolean executeQuery(String query, String connectionString)
+        {
             using (OdbcConnection connection =
-                       new OdbcConnection(connectionString))
+           new OdbcConnection(connectionString))
             {
                 // The insertSQL string contains a SQL statement that
                 // inserts a new row in the source table.
-                OdbcCommand command = new OdbcCommand(insertSQL, connection);
+                OdbcCommand command = new OdbcCommand(query, connection);
 
                 // Open the connection and execute the insert command.
                 try
@@ -91,9 +122,8 @@ using System.Configuration;
                 // code exits the using block.
                 return true;
             }
-
-
         }
+        
 
 
     }

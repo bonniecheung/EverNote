@@ -12,7 +12,7 @@ namespace SampleApp.Domain.Mappings
 
         public NoteEntryMap()
         {
-            Schema("public");
+            Schema("evernote");
             Table("notes");
 
             Id(x => x.id).Column("id");
