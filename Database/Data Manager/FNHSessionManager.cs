@@ -23,7 +23,7 @@ namespace SampleApp.Database.DataManager
         public enum DatabaseType
         {
             MySQL = 0,
-            //Postgres,
+            Postgres,
             //MsSql = 0,
             MsSqlCe
         }
@@ -43,11 +43,13 @@ namespace SampleApp.Database.DataManager
         {
             get
             {
-                if (!ManagedWebSessionContext.HasBind(HttpContext.Current, SessionFactory))
-                {
-                    ManagedWebSessionContext.Bind(HttpContext.Current, SessionFactory.OpenSession());
-                }
-                return _sessionFactory.GetCurrentSession();
+                //if (!ManagedWebSessionContext.HasBind(HttpContext.Current, SessionFactory))
+                //{
+                //    ManagedWebSessionContext.Bind(HttpContext.Current, SessionFactory.OpenSession());
+                //}
+                
+                //return _sessionFactory.GetCurrentSession();
+                return _sessionFactory.OpenSession();
             }
         }
 
@@ -62,20 +64,22 @@ namespace SampleApp.Database.DataManager
         /// </summary>
         /// <param name="dbConfigKey">The database connection string.</param>
         /// <param name="dbType">The database type to create a connection. </param>
-        public FNHSessionManager(string dbConfigKey, DatabaseType dbType)
+        public FNHSessionManager(DatabaseType dbType)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["mySqlConnectionString"].ConnectionString;
-            
+            //string connectionString = "Server=127.0.0.1;Database=evernote;Uid=root;Pwd=tindrbonnie;";
+
             switch (dbType)
             {
                 case DatabaseType.MySQL:
+                    
                     _sessionFactory = Fluently.Configure()
                         .Database(
                             MySQLConfiguration.Standard
-                                .ConnectionString(c => c.FromConnectionStringWithKey(connectionString))
+                                .ConnectionString(c => c.FromConnectionStringWithKey("mySqlConnectionString"))
                         )
                         .Mappings(m => m.FluentMappings.AddFromAssemblyOf<T>())
-                        .CurrentSessionContext(typeof(ManagedWebSessionContext).FullName)
+                        .CurrentSessionContext(typeof(ThreadStaticSessionContext).AssemblyQualifiedName)
                         .BuildSessionFactory();
                     break;
                 //case DatabaseType.MySQL:
@@ -90,17 +94,17 @@ namespace SampleApp.Database.DataManager
                 //case DatabaseType.Postgres:
                 //    FluentConfiguration config = Fluently.Configure();
                 //    config.Database(PostgreSQLConfiguration.Standard.ConnectionString(connectionString));
-                //            //MsSqlConfiguration.MsSql2008
-                //                //.ConnectionString(dbConfigKey)
+                //    //MsSqlConfiguration.MsSql2008
+                //    //.ConnectionString(dbConfigKey)
                 //    config.Mappings(m => m.FluentMappings.AddFromAssemblyOf<T>());
                 //    config.CurrentSessionContext(typeof(ManagedWebSessionContext).FullName);
-                //   _sessionFactory = config.BuildSessionFactory();
+                //    _sessionFactory = config.BuildSessionFactory();
                 //    break;
                 case DatabaseType.MsSqlCe:
                     _sessionFactory = Fluently.Configure()
                         .Database(
                             MsSqlConfiguration.MsSql2008
-                                .ConnectionString(c => c.FromConnectionStringWithKey(dbConfigKey))
+                                .ConnectionString(c => c.FromConnectionStringWithKey(connectionString))
                         )
                         .Mappings(m => m.FluentMappings.AddFromAssemblyOf<T>())
                         .CurrentSessionContext(typeof(ManagedWebSessionContext).FullName)

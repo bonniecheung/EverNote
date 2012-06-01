@@ -28,9 +28,6 @@ using SampleApp.Domain.Objects;
 public class NoteFetcher {
     public static void Main(string[] args) {
 
-        // Data source name string
-        String connectionString = "DSN=EverNoteDB;Uid=postgres;Pwd=tindrbonnie;";
-
         // Developer token for Evernote API
         String authToken = "S=s1:U=2261f:E=13eccfa5d71:C=13775493171:P=1cd:A=en-devtoken:H=fe7ee8dac619c7d380a0f9f3731a8698";
 
@@ -40,6 +37,9 @@ public class NoteFetcher {
         TTransport userStoreTransport = new THttpClient(userStoreUrl);
         TProtocol userStoreProtocol = new TBinaryProtocol(userStoreTransport);
         UserStore.Client userStore = new UserStore.Client(userStoreProtocol);
+
+        FNHSessionManager<NoteEntry> sessionManager = new FNHSessionManager<NoteEntry>(FNHSessionManager<NoteEntry>.DatabaseType.MySQL);
+        FNHRepository<NoteEntry> repository = new FNHRepository<NoteEntry>(sessionManager);
         
         bool versionOK =
             userStore.checkVersion("Evernote EDAMTest (C#)",
@@ -131,18 +131,26 @@ public class NoteFetcher {
                     line1 = split[n - 1];
                     line3 = split[n + 1];
 
-                    Entry entry = new Entry();
-                    entry.setGuid(Guid);
-                    entry.setLine1(line1);
-                    entry.setLine2(line2);
-                    entry.setLine3(line3);
+                    Entry postgresEntry = new Entry();
+                    postgresEntry.setGuid(Guid);
+                    postgresEntry.setLine1(line1);
+                    postgresEntry.setLine2(line2);
+                    postgresEntry.setLine3(line3);
 
-                    Console.WriteLine("Note GUID: " + entry.getGuid());
+                    Console.WriteLine("Note GUID: " + postgresEntry.getGuid());
                     Console.WriteLine();
-                    entry.displayLines();
-                    entry.InsertRow(connectionString);
+                    postgresEntry.displayLines();
+                    postgresEntry.InsertRow();
                     Console.WriteLine();
-                    entry.getLastInsertedRow(connectionString);
+                    postgresEntry.getLastInsertedRow();
+
+                    NoteEntry mysqlNote = new NoteEntry();
+                    mysqlNote.Guid = Guid;
+                    mysqlNote.Line1 = line1;
+                    mysqlNote.Line2 = line2;
+                    mysqlNote.Line3 = line3;
+
+                    repository.Create(mysqlNote);
                 }
             }
         }
@@ -150,17 +158,18 @@ public class NoteFetcher {
         Console.WriteLine();
         Console.WriteLine("These lines have been saved to a Postgresql database under the table Notes.");
         Console.WriteLine();
+        Console.WriteLine("Which row do you want to retrieve from the MySQL database?");
+        String id = Console.ReadLine();
+        int num = int.Parse(id);
+        NoteEntry noteEntry = repository.RetrieveById(num);
 
-        //FNHSessionManager<NoteEntry> sessionManager = new FNHSessionManager<NoteEntry>(connectionString, FNHSessionManager<NoteEntry>.DatabaseType.MySQL);
-        //FNHRepository<NoteEntry> repository = new FNHRepository<NoteEntry>(sessionManager);
-
-        //NoteEntry noteEntry = repository.RetrieveById(1);
-
-        //Console.WriteLine("This is entry 1 retrieved from the database...");
-        //Console.WriteLine("GUID: " + noteEntry.Guid);
-        //Console.WriteLine("Line 1: " + noteEntry.Line1);
-        //Console.WriteLine("Line 2: " + noteEntry.Line2);
-        //Console.WriteLine("Line 3: " + noteEntry.Line3);
+        Console.WriteLine("This is entry " + num + " retrieved from the MySQL database...");
+        Console.WriteLine();
+        Console.WriteLine("GUID: " + noteEntry.Guid);
+        Console.WriteLine("Line 1: " + noteEntry.Line1);
+        Console.WriteLine("Line 2: " + noteEntry.Line2);
+        Console.WriteLine("Line 3: " + noteEntry.Line3);
+        Console.WriteLine();
 
         Console.WriteLine("Click ENTER to continue...");
         Console.ReadLine();

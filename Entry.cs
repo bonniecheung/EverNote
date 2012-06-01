@@ -10,6 +10,7 @@ using System.Configuration;
         public String line1;
         public String line2;
         public String line3;
+        String connectionString = "DSN=EverNoteDB;Uid=postgres;Pwd=tindrbonnie;";
 
         public void setGuid(String Guid)
         {
@@ -64,22 +65,22 @@ using System.Configuration;
             return line3;
         }
 
-        public Boolean InsertRow(string connectionString)
+        public Boolean InsertRow()
         {
             String insertSQL = "INSERT INTO notes (guid, line1, line2, line3) " +
              "VALUES ('" + this.getGuid() + "','" + this.getLine1() + "','" + this.getLine2() + "', '" + this.getLine3() + "')";
 
-            Boolean b = executeQuery(insertSQL, connectionString);
+            Boolean b = executeQuery(insertSQL);
 
             return b;
         }
 
-        public void getLastInsertedRow(string myConnectionString)
+        public void getLastInsertedRow()
         {
 
             String mySelectQuery = "SELECT id, guid, line1, line2, line3 FROM notes WHERE id = (SELECT MAX(id) FROM notes)";
 
-            OdbcConnection myConnection = new OdbcConnection(myConnectionString);
+            OdbcConnection myConnection = new OdbcConnection(connectionString);
             OdbcCommand myCommand = new OdbcCommand(mySelectQuery, myConnection);
             myConnection.Open();
             OdbcDataReader myReader = myCommand.ExecuteReader(CommandBehavior.CloseConnection);
@@ -98,7 +99,7 @@ using System.Configuration;
             myReader.Close();
         }
 
-        public Boolean executeQuery(String query, String connectionString)
+        public Boolean executeQuery(String query)
         {
             using (OdbcConnection connection =
            new OdbcConnection(connectionString))
