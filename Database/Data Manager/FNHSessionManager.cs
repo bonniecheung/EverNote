@@ -23,7 +23,7 @@ namespace SampleApp.Database.DataManager
         public enum DatabaseType
         {
             MySQL = 0,
-            Postgres,
+            //Postgres,
             //MsSql = 0,
             MsSqlCe
         }

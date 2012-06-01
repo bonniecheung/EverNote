@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Oracle.DataAccess.Client;
+using System.Data.Odbc;
+using System.Data;
 
 namespace SampleApp.Domain.Objects
 {

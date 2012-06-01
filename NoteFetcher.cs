@@ -142,7 +142,7 @@ public class NoteFetcher {
                     postgresEntry.displayLines();
                     postgresEntry.InsertRow();
                     Console.WriteLine();
-                    postgresEntry.getLastInsertedRow();
+                    //postgresEntry.getLastInsertedRow();
 
                     NoteEntry mysqlNote = new NoteEntry();
                     mysqlNote.Guid = Guid;
@@ -156,7 +156,8 @@ public class NoteFetcher {
         }
 
         Console.WriteLine();
-        Console.WriteLine("These lines have been saved to a Postgresql database under the table Notes.");
+        Console.WriteLine("These lines have been saved to a Postgresql database using ODBC.");
+        Console.WriteLine("They have also been saved to a MySQL database using Fluent NHibernate.");
         Console.WriteLine();
         Console.WriteLine("Which row do you want to retrieve from the MySQL database?");
         String id = Console.ReadLine();
